@@ -1,0 +1,5 @@
+#Kommentar
+User-agent: *
+
+Disallow: /impressum.html
+Disallow: /Datenschutz.html

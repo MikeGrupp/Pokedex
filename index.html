@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokedex</title>
+
+    <link rel="icon" type="image/x-icon" href="./assets/icons/Logo.png">
+    <link rel="stylesheet" href="./styles/fonts.css" />
+    <link rel="stylesheet" href="./style.css" />
+    <link rel="stylesheet" href="./styles/assets.css" />
+    <link rel="stylesheet" href="./styles/basket.css" />
+    <link rel="stylesheet" href="./styles/standard.css" />
+    <link rel="stylesheet" href="./styles/media_query.css" />
+    <script src="./scripts/db.js"></script>
+    <script src="./scripts/template.js"></script>
+    <script src="./script.js"></script>
+
+    <script>
+        window.onload = function () {
+            init();
+        }
+    </script>
+
+</head>
+
+<body>
+    <header w3-include-html="./templates/header.html"></header>
+    <section class="dialog_bg">
+        <div id="pokemon_info" class="pokemon_info"></div>
+    </section>
+    <section class="content_wrapper">
+        <div id="content" class="content">
+        </div>
+    </section>
+    <section class="center button_container">
+        <button onclick="loadMorePokemon()">more Pokemon!</button>
+    </section>
+    <footer class="center" w3-include-html="./templates/footer.html"></footer>
+</body>
+
+</html>

@@ -38,11 +38,11 @@ async function loadPokemonData() {
 }
 
 // render pokemon cards
-function renderPokemonCards(pokemonList) {
+async function renderPokemonCards(pokemonList) {
     for (let i = 0; i < pokemonList.length; i++) {
         let pokemon = pokemonList[i];
         let pokemonName = pokemon.name;
-        fetchPokemonDetails(pokemonName);
+        await fetchPokemonDetails(pokemonName);
     }
 }
 
@@ -55,12 +55,18 @@ async function fetchPokemonDetails(pokemonName) {
     let pokemonColour2 = pokemonDetails.types[1] ? pokemonDetails.types[1].type.name : pokemonType1;
 
     let content = document.getElementById('content');
-    content.innerHTML += createPokemonCard(pokemonId, pokemonName, pokemonSprites, pokemonType1, pokemonType2, pokemonColour2);
+    content.innerHTML += createPokemonCard(
+        pokemonId, 
+        pokemonName, 
+        pokemonSprites, 
+        pokemonType1, 
+        pokemonType2, 
+        pokemonColour2);
 }
 
 function createPokemonCard(pokemonId, pokemonName, pokemonSprites, pokemonType1, pokemonType2, pokemonColour2) {
     return `
-        <div id="pkmn#${pokemonId}" onclick="openPokemonDetail(${pokemonId})" class="pokemon_card">
+        <div id="pkmn#${pokemonId}" onclick="openPokemonDetail(${pokemonId}, '${pokemonName}')" class="pokemon_card">
             <div class="pkmn_card_top">
                 <div>
                     #${pokemonId}
@@ -83,12 +89,196 @@ function createPokemonCard(pokemonId, pokemonName, pokemonSprites, pokemonType1,
     `;
 }
 
-// render pokemon cards
-async function openPokemonDetail(pokemonId) {
-    let pokemonDetails = await fetchData(`pokemon/${pokemonId}`);
-    let pokemonInfo = document.getElementById('pokemon_info');
-    
-    pokemonInfo.innerHTML = createGeneralPokemonInfo();
+// render pokemon infos
+async function openPokemonDetail(pokemonId, pokemonName) {
+    let pokemonDetails = await fetchData(`pokemon/${pokemonName}`);
+    let topContent = document.getElementById('pokemon_sprite');
+
+    let pokemonSprites = pokemonDetails.sprites.front_default;
+    let pokemonType1 = pokemonDetails.types[0].type.name;
+    let pokemonType2 = pokemonDetails.types[1] ? pokemonDetails.types[1].type.name : "";
+    let pokemonColour2 = pokemonDetails.types[1] ? pokemonDetails.types[1].type.name : pokemonType1;
+
+    topContent.innerHTML = await createPokemonDetailTop(
+        pokemonId, 
+        pokemonName, 
+        pokemonSprites, 
+        pokemonType1, 
+        pokemonColour2);
+
+        pokemonDetailAbout(pokemonName);
+     document.getElementById('pokemon_detail_wrapper').classList.remove('d-none');
+}
+
+function createPokemonDetailTop(pokemonId, pokemonName, pokemonSprites, pokemonType1, pokemonColour2) {
+    return `
+        <div class="pkmn_detail">
+            <div class="pkmn_detail_top">
+                <div>
+                    #${pokemonId}
+                </div>
+                <div>
+                    ${pokemonName}
+                </div>
+            </div>
+            <img class="pokemon_img" src="${pokemonSprites}" alt="${pokemonName}_img">
+            <div class="type_circle_detail">
+                <div class="upper_half ${pokemonType1}"></div>
+                <div class="lower_half ${pokemonColour2}"></div>
+                <div class="center_circle"></div>
+            </div>
+            <div class="pkmn_detail_bottom">
+                <div class="detail_buttons">
+                    <button onclick="pokemonDetailAbout('${pokemonName}')">About</button>
+                    <button onclick="pokemonDetailStats('${pokemonName}')">Stats</button>
+                    <button onclick="pokemonDetailEvolution('${pokemonName}')">Evolution</button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+//render pokemon about
+async function pokemonDetailAbout(pokemonName) {
+    let pokemonDetails = await fetchData(`pokemon/${pokemonName}`);
+    let bottomContent = document.getElementById('pokemon_info');
+
+    let pokemonType1 = pokemonDetails.types[0].type.name;
+    let pokemonType2 = pokemonDetails.types[1] ? pokemonDetails.types[1].type.name : "";
+    let pokemonHeight = pokemonDetails.height / 10;
+    let pokemonWeight = pokemonDetails.weight / 10;
+    let pokemonSpecies = pokemonDetails.species.name;
+    let pokemonAbilitiy1 = pokemonDetails.abilities[0].ability.name;
+    let pokemonAbilitiy2 = pokemonDetails.abilities?.[1]?.ability?.name ?? "";
+    let pokemonAbilitiy3 = pokemonDetails.abilities?.[2]?.ability?.name ?? "";
+
+    bottomContent.innerHTML = createPokemonDetailAbout(
+        pokemonType1, 
+        pokemonType2,
+        pokemonSpecies,
+        pokemonHeight,
+        pokemonWeight,
+        pokemonAbilitiy1,
+        pokemonAbilitiy2,
+        pokemonAbilitiy3);
+}
+
+function createPokemonDetailAbout(pokemonType1, pokemonType2, pokemonSpecies, pokemonHeight, pokemonWeight, pokemonAbility1, pokemonAbility2, pokemonAbility3) {
+    return `
+    <table>
+            <tr>
+            <td>Type:</td>
+            <td><span class="type_box ${pokemonType1}">${pokemonType1}</span></td>
+            <td><span class="type_box ${pokemonType2}">${pokemonType2}</span></td>
+        </tr>
+        </table>
+    <table>
+        <tr>
+            <td>Species:</td>
+             <td>${pokemonSpecies}</td>
+        </tr>
+        <tr>
+            <td>Height:</td>
+            <td>${pokemonHeight} m</td>
+        </tr>
+        <tr>
+            <td>Weight:</td>
+            <td>${pokemonWeight} kg</td>
+        </tr>
+        <tr>
+            <td>Abilities:</td>
+            <td>${pokemonAbility1} ${pokemonAbility2} ${pokemonAbility3}</td>
+        </tr>
+    </table>
+    `;
+}
+
+//render pokemon stats
+async function pokemonDetailStats(pokemonName) {
+    let pokemonDetails = await fetchData(`pokemon/${pokemonName}`);
+    let bottomContent = document.getElementById('pokemon_info');
+
+    let pokemonHp = pokemonDetails.stats[0].base_stat;
+    let pokemonAtk = pokemonDetails.stats[1].base_stat;
+    let pokemonDef = pokemonDetails.stats[2].base_stat;
+    let pokemonSpatk = pokemonDetails.stats[3].base_stat;
+    let pokemonSpdef = pokemonDetails.stats[4].base_stat;
+    let pokemonSpd = pokemonDetails.stats[5].base_stat;
+
+    bottomContent.innerHTML = createPokemonDetailStats(
+        pokemonHp, 
+        pokemonAtk,
+        pokemonDef,
+        pokemonSpatk,
+        pokemonSpdef,
+        pokemonSpd);
+}
+
+function createPokemonDetailStats(pokemonHp, pokemonAtk, pokemonDef, pokemonSpatk, pokemonSpdef, pokemonSpd) {
+    return `
+    <table>
+        <tr>
+            <td>HP:</td>
+             <td>${pokemonHp}</td>
+        </tr>
+        <tr>
+            <td>Attack:</td>
+             <td>${pokemonAtk}</td>
+        </tr>
+        <tr>
+            <td>Defense:</td>
+            <td>${pokemonDef}</td>
+        </tr>
+        <tr>
+            <td>Special-attack:</td>
+             <td>${pokemonSpatk}</td>
+        </tr>
+        <tr>
+            <td>Special-defense:</td>
+             <td>${pokemonSpdef}</td>
+        </tr>
+        <tr>
+            <td>Speed:</td>
+            <td>${pokemonSpd}</td>
+        </tr>
+    </table>
+    `;
+}
+
+//render pokemon game indices
+async function pokemonDetailGames() {
+    let pokemonDetails = await fetchData(`pokemon/${pokemonName}`);
+    let bottomContent = document.getElementById('pokemon_info');
+
+
+    for (let i = 0; i < array.length; i++) {
+        const element = array[i];
+        let pokemonGameIndices = pokemonDetails.game_indices[i].version.name; // hier!
+    }
+    let pokemonHp = pokemonDetails.stats[0].base_stat;
+
+
+    bottomContent.innerHTML = createPokemonDetailGames(
+        pokemonHp, 
+        pokemonAtk,
+        pokemonDef,
+        pokemonSpatk,
+        pokemonSpdef,
+        pokemonSpd);
+}
+
+function createPokemonDetailGames() {
+    return `
+
+    `;
+}
+
+function closePokemonDetail(event) {
+    // Überprüfen, ob der Klick außerhalb des Dialogs war
+    const wrapper = document.getElementById('pokemon_detail_wrapper');
+    if (event.target === wrapper.querySelector('.pokemon_detail_bg')) {
+        wrapper.classList.add('d-none');
+    }
 }
 
 // load pokemon cards

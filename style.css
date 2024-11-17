@@ -13,7 +13,7 @@
     flex-direction: row;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
 }
 
 .pokemon_card {
@@ -24,7 +24,6 @@
     border: 0;
     width: 200px;
     height: 300px;
-    padding: 4px;
     position: relative;
     z-index: 1;
     gap: 24px;
@@ -60,6 +59,18 @@
     border-radius: 50%;
     position: absolute;
     top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    overflow: hidden;
+}
+
+.type_circle_detail {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    position: absolute;
+    top: 130px;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: -1;
@@ -102,10 +113,87 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
     padding: 4px;
     margin-left: 8px;
     font-size: 16px;
+
+}
+
+.pokemon_detail_wrapper {
+    z-index: 10;
+}
+
+.pkmn_detail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    position: relative;
+    z-index: 1;
+    gap: 16px;
+}
+
+.pkmn_detail_top {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.pokemon_info {
+    width: 490px;
+    margin: 0 auto;
+}
+
+.pokemon_detail {
+    background-color: rgb(243,242,233);
+    z-index: 30;
+    height: 50vh;
+    width: 50vw;
+    padding: 24px;
+}
+
+.types_detail {
+    display: flex;
+    height: 200px;
+    width: 200px;
+    z-index: 1;
+}
+
+.left_half {
+    height: 100%;
+    width: 100%;
+}
+
+.right_half {
+    height: 100%;
+    width: 100%;
+}
+
+.pokemon_detail_bg {
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 20;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.detail_buttons {
+    z-index: 30;
+    margin-top: 16px;
+    margin-bottom: 32px;
+}
+
+.detail_buttons button {
+    width: 160px;
+    z-index: 30;
 }
 
 .button_container {

@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="./styles/fonts.css" />
     <link rel="stylesheet" href="./style.css" />
     <link rel="stylesheet" href="./styles/assets.css" />
-    <link rel="stylesheet" href="./styles/basket.css" />
     <link rel="stylesheet" href="./styles/standard.css" />
     <link rel="stylesheet" href="./styles/media_query.css" />
     <script src="./scripts/db.js"></script>
@@ -27,9 +26,15 @@
 
 <body>
     <header w3-include-html="./templates/header.html"></header>
-    <section class="dialog_bg">
-        <div id="pokemon_info" class="pokemon_info"></div>
+    <section id="pokemon_detail_wrapper" class="d-none">
+        <div class="pokemon_detail_bg" onclick="closePokemonDetail(event)">
+            <div id="pokemon_detail" class="pokemon_detail" onclick="event.stopPropagation()">
+                <div id="pokemon_sprite" class="pokemon_detail_top"></div>
+                <div id="pokemon_info" class="pokemon_info"></div>
+            </div>
+        </div>
     </section>
+    
     <section class="content_wrapper">
         <div id="content" class="content">
         </div>

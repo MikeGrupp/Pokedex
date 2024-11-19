@@ -143,7 +143,7 @@
 }
 
 .pokemon_info {
-    width: 490px;
+    width: 330px;
     margin: 0 auto;
 }
 
@@ -200,6 +200,59 @@
     margin: 32px;
 }
 
+.loading_screen {
+    background-color: rgba(0, 0, 0, 0.8);
+    gap: 16px;
+    font-size: 24px;
+    color: white;
+    z-index: 20;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading_animation {
+    animation: spin 2s linear infinite;
+    height: 64px;
+    width: 64px;
+}
+
+.left-button {
+    z-index: 30;
+    position: fixed;
+    left: 25%;
+    top: 50vh;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+}
+
+.right-button {
+    z-index: 30;
+    position: fixed;
+    right: 25%;
+    top: 50vh;
+    display: flex;
+    align-items: center;
+
+    padding: 8px;
+}
+
 .normal {
     background-color: #A8A77A;
 }
@@ -209,7 +262,7 @@
 }
 
 .water {
-    background-color: #6390F0;
+    background-color: #6363f0;
 }
 
 .electric {

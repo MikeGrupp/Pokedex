@@ -26,6 +26,14 @@
 
 <body>
     <header w3-include-html="./templates/header.html"></header>
+
+    <section id="loading_screen" class="d-none">
+        <div class="loading_screen">
+            <img class="loading_animation" src="./assets/icons/Logo.png" alt="loading">
+            <span>loading Pokemon</span>
+        </div>
+    </section>
+
     <section id="pokemon_detail_wrapper" class="d-none">
         <div class="pokemon_detail_bg" onclick="closePokemonDetail(event)">
             <div id="pokemon_detail" class="pokemon_detail" onclick="event.stopPropagation()">
@@ -39,9 +47,11 @@
         <div id="content" class="content">
         </div>
     </section>
+
     <section class="center button_container">
         <button onclick="loadMorePokemon()">more Pokemon!</button>
     </section>
+
     <footer class="center" w3-include-html="./templates/footer.html"></footer>
 </body>
 

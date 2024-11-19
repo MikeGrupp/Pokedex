@@ -66,7 +66,7 @@ async function fetchPokemonDetails(pokemonName) {
 
 function createPokemonCard(pokemonId, pokemonName, pokemonSprites, pokemonType1, pokemonType2, pokemonColour2) {
     return `
-        <div id="pkmn#${pokemonId}" onclick="openPokemonDetail(${pokemonId}, '${pokemonName}')" class="pokemon_card">
+        <div id="pkmn#${pokemonId}" onclick="openPokemonDetail(${pokemonId})" class="pokemon_card">
             <div class="pkmn_card_top">
                 <div>
                     #${pokemonId}
@@ -90,10 +90,11 @@ function createPokemonCard(pokemonId, pokemonName, pokemonSprites, pokemonType1,
 }
 
 // render pokemon infos
-async function openPokemonDetail(pokemonId, pokemonName) {
-    let pokemonDetails = await fetchData(`pokemon/${pokemonName}`);
+async function openPokemonDetail(pokemonId) {
+    let pokemonDetails = await fetchData(`pokemon/${pokemonId}`);
     let topContent = document.getElementById('pokemon_sprite');
 
+    let pokemonName = pokemonDetails.name;
     let pokemonSprites = pokemonDetails.sprites.front_default;
     let pokemonType1 = pokemonDetails.types[0].type.name;
     let pokemonType2 = pokemonDetails.types[1] ? pokemonDetails.types[1].type.name : "";
@@ -131,9 +132,10 @@ function createPokemonDetailTop(pokemonId, pokemonName, pokemonSprites, pokemonT
                 <div class="detail_buttons">
                     <button onclick="pokemonDetailAbout('${pokemonName}')">About</button>
                     <button onclick="pokemonDetailStats('${pokemonName}')">Stats</button>
-                    <button onclick="pokemonDetailEvolution('${pokemonName}')">Evolution</button>
                 </div>
             </div>
+            <img class="left-button icon" onclick="leftImage(${pokemonId-1})" src="assets/icons/left.png">
+            <img class="right-button icon" onclick="rightImage(${pokemonId+1})" src="assets/icons/right.png">
         </div>
     `;
 }
@@ -245,34 +247,6 @@ function createPokemonDetailStats(pokemonHp, pokemonAtk, pokemonDef, pokemonSpat
     `;
 }
 
-//render pokemon game indices
-async function pokemonDetailGames() {
-    let pokemonDetails = await fetchData(`pokemon/${pokemonName}`);
-    let bottomContent = document.getElementById('pokemon_info');
-
-
-    for (let i = 0; i < array.length; i++) {
-        const element = array[i];
-        let pokemonGameIndices = pokemonDetails.game_indices[i].version.name; // hier!
-    }
-    let pokemonHp = pokemonDetails.stats[0].base_stat;
-
-
-    bottomContent.innerHTML = createPokemonDetailGames(
-        pokemonHp, 
-        pokemonAtk,
-        pokemonDef,
-        pokemonSpatk,
-        pokemonSpdef,
-        pokemonSpd);
-}
-
-function createPokemonDetailGames() {
-    return `
-
-    `;
-}
-
 function closePokemonDetail(event) {
     // Überprüfen, ob der Klick außerhalb des Dialogs war
     const wrapper = document.getElementById('pokemon_detail_wrapper');
@@ -283,9 +257,30 @@ function closePokemonDetail(event) {
 
 // load pokemon cards
 async function loadMorePokemon() {
+    document.getElementById('loading_screen').classList.remove('d-none');
     let pokemonList = await loadPokemonData();
     await renderPokemonCards(pokemonList);
+    await document.getElementById('loading_screen').classList.add('d-none');
 }
+
+// switch to next or previous card
+  function leftImage(previous) {
+    if (previous == 0) {
+        openPokemonDetail(previous+1)
+    } else {
+        openPokemonDetail(previous)
+    }
+  }
+  
+  function rightImage(next) {
+    if (next == offset+1) {
+        openPokemonDetail(next-1)
+    } else {
+        openPokemonDetail(next)
+    }
+  }
+
+// search for Pokemon
 
 
 

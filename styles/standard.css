@@ -35,7 +35,7 @@ button:hover {
 header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     height: 64px;
     padding: 16px;
     border: 0;
@@ -50,6 +50,15 @@ footer {
     border: 0;
     background-color: rgba(68, 79, 89);
     margin-top: 32px;
+}
+
+form {
+    gap: 32px;
+}
+
+input {
+    font-size: 24px;
+    height: 32px;
 }
 
 /* width */

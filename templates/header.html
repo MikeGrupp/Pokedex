@@ -1,2 +1,9 @@
-<a href="/index.html"><img class="icon" src="./assets/icons/Logo.png" alt="home-icon"></a>
-
+<div class="navbar">
+    <a href="/index.html"><img class="icon" src="./assets/icons/Logo.png" alt="home-icon"></a>
+    <span class="title">Pokédex</span>
+    <form class="navbar" onsubmit="searchPokemon(event)">
+        <input type="text" id="pokemonInput" placeholder="Pokémon eingeben">
+        <button type="submit">suchen</button>
+    </form>
+</div>
+<div class="d-none" id="searchResult"></div>

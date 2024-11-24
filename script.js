@@ -2,12 +2,16 @@
 function init() {
     includeHTML();
     loadMorePokemon();
+    loadAllPokemon();
+    closePokemonSearch();
 }
 
 //global variables
 const BASE_URL = "https://pokeapi.co/api/v2/";
 let offset = 0; // Startoffset for the first 18 Pokémon
 const limit = 18; // amount of Pokémon for every call
+let allPokemon = [];
+let currentPokemon = [];
 
 //include header und footer
 async function includeHTML() {
@@ -99,6 +103,8 @@ async function openPokemonDetail(pokemonId) {
     let pokemonType1 = pokemonDetails.types[0].type.name;
     let pokemonType2 = pokemonDetails.types[1] ? pokemonDetails.types[1].type.name : "";
     let pokemonColour2 = pokemonDetails.types[1] ? pokemonDetails.types[1].type.name : pokemonType1;
+
+    resetSearchResult();
 
     topContent.innerHTML = await createPokemonDetailTop(
         pokemonId, 
@@ -281,59 +287,97 @@ async function loadMorePokemon() {
   }
 
 // search for Pokemon
-
-
-
-// Tests
-let promError = false;
-
-function getPromise() {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            console.log("1")
-            if (promError) {
-                reject();
-            } else {
-                resolve();
-            }
-        }, 1000);
-    });
+async function loadPokemonCount() {
+    let data = await fetchData(`pokemon`);
+    return data.count;
 }
 
-function getPromise2() {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            console.log("2")
-            if (promError) {
-                reject("hat nicht geklappt");
-            } else {
-                resolve("hat geklappt");
-            }
-        }, 1000);
-    });
+async function loadAllPokemon() {
+    let count = await loadPokemonCount();
+    let data = await fetchData(`pokemon?limit=${count}&offset=0`);
+    allPokemon = data.results.map(pokemon => pokemon.name);
 }
 
-function getPromise3() {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            console.log("3")
-            if (promError) {
-                reject("hat nicht geklappt");
-            } else {
-                resolve("hat geklappt");
-            }
-        }, 1000);
-    });
-}
+function searchPokemon(event) {
+    event.preventDefault(); // prevent reloading the page
 
-async function usePromise() {
-    try {
-        await getPromise();
-        await getPromise2();
-        await getPromise3();
-        console.log("Erfolg")
-    } catch (error) {
-        console.log(error)
+    let inputField = document.getElementById("pokemonInput");
+    let searchName = inputField.value.trim().toLowerCase(); // delete space and siwtch to lower case
+
+    if (searchName.length < 3) {
+        displayResult("Bitte mindestens 3 Buchstaben eingeben.");
+        return;
     }
-    console.log("Abgeschlossen")
+
+    let matchedPokemon = allPokemon.filter(pokemon => pokemon.includes(searchName));
+    let limitedResults = matchedPokemon.slice(0, 10);
+    currentPokemon = [...limitedResults];
+    renderFoundPokemon(searchName);
+}
+
+// render found pokemon
+async function renderFoundPokemon(searchName) {
+    document.getElementById('searchResult').classList.remove('d-none');
+    document.getElementById('searchResult').classList.add('searchResult');
+    if (currentPokemon.length > 0) {
+        for (let i = 0; i < currentPokemon.length; i++) {
+            let pokemon = currentPokemon[i];
+            await fetchFoundPokemon(pokemon);
+        }
+    } else {
+        displayResult(`Keine Pokémon gefunden, die "${searchName}" enthalten.`);
+    }
+}
+
+async function fetchFoundPokemon(pokemonName) {
+    let pokemonDetails = await fetchData(`pokemon/${pokemonName}`);
+    let pokemonId = pokemonDetails.id;
+    let pokemonSprites = pokemonDetails.sprites.front_default;
+
+    let content = document.getElementById('searchResult');
+    content.innerHTML += createFoundPokemon(pokemonId, pokemonName, pokemonSprites);
+}
+
+function createFoundPokemon(pokemonId, pokemonName, pokemonSprites) {
+    return `
+    <div onclick="openPokemonDetail(${pokemonId})" class="pokemon_card_small">
+        <div class="pkmn_search">
+                ${pokemonName}
+        </div>
+        <img class="search_img" src="${pokemonSprites}" alt="${pokemonName}_img">
+    </div>
+`;
+}
+
+//close found Pokemon dialog
+function resetSearchResult() {
+    let content = document.getElementById('searchResult');
+    content.innerHTML = "";
+    document.getElementById('searchResult').classList.remove('searchResult');
+    document.getElementById('searchResult').classList.add('d-none');
+}
+
+function closePokemonSearch() {
+    document.addEventListener("click", function (event) {
+        let searchResultDiv = document.getElementById("searchResult");
+
+        // Prüfen, ob der Klick außerhalb des searchResultDivs erfolgte
+        if (!searchResultDiv.contains(event.target)) {
+            resetSearchResult();
+        }
+    });
+}
+
+// display search error
+function displayResult(message) {
+    let resultDiv = document.getElementById("searchResult");
+    resultDiv.innerHTML = createSearchError(message);
+}
+
+function createSearchError(message) {
+    return `
+    <div class="pokemon_card_small">
+        ${message}
+    </div>
+`;
 }

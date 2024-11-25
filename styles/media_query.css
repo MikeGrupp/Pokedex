@@ -35,6 +35,7 @@
 
     .pokemon_detail {
         width: 100vw;
+        height: 65vh;
     }
 
     .detail_buttons button {
@@ -53,6 +54,7 @@
     .pokemon_info {
         width: 175px;
         font-size: 12px;
+
     }
 
     .searchResult {
@@ -159,7 +161,7 @@
 }
 
 @media screen and (max-width: 1920px) and (min-width: 1440px) {
-
+    
 }
 
 @media (min-width: 1921px) {
@@ -170,5 +172,27 @@
 
     .section_gap {
         gap: 64px;
+    }
+
+    .content {
+        width: 1920px;
+    }
+
+    .content_wrapper {
+        display: flex;
+        justify-content: center;
+    }
+
+    .left-button {
+        left: 35%;
+    }
+    
+    .right-button {
+        right: 35%;
+    }
+
+    .pokemon_detail {
+        height: 540px;
+        width: 960px;
     }
 }

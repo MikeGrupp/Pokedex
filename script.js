@@ -1,13 +1,9 @@
 function init() {
     includeHTML();
     loadMorePokemon();
-    loadAllPokemon();
+    loadSavedPokemon();
     closePokemonSearch();
 }
-
-const BASE_URL = "https://pokeapi.co/api/v2/";
-let offset = 0;
-const limit = 18;
 
 async function includeHTML() {
     let includeElements = document.querySelectorAll('[w3-include-html]');
@@ -23,17 +19,44 @@ async function includeHTML() {
     }
 }
 
+// fetch from API
 async function fetchData(path = "") {
     let response = await fetch(BASE_URL + path);
     return response.json();
 }
 
+// get from local storage
+function getAllPokemonLocalStorage() {
+    let savedAllPokemon = localStorage.getItem('savedAllPokemon');
+    if (savedAllPokemon) {
+        allPokemon = JSON.parse(savedAllPokemon);
+    }
+}
+
+// load data (get local storage or fetch from api)
 async function loadPokemonData() {
     let data = await fetchData(`pokemon?limit=${limit}&offset=${offset}`);
     offset += limit;
     return data.results;
 }
 
+async function fetchPokemonCount() {
+    let data = await fetchData(`pokemon`);
+    return data.count;
+}
+
+async function loadSavedPokemon() {
+    let count = await fetchPokemonCount();
+    if (localStorage.getItem('savedAllPokemon')) {
+        getAllPokemonLocalStorage();
+    } else {
+        let data = await fetchData(`pokemon?limit=${count}&offset=0`);
+        allPokemon = data.results.map(pokemon => pokemon.name);
+        saveAllPokemonLocal();
+    }
+}
+
+// render
 async function renderPokemonCards(pokemonList) {
     for (let i = 0; i < pokemonList.length; i++) {
         let pokemon = pokemonList[i];
@@ -140,19 +163,16 @@ async function loadMorePokemon() {
     await document.getElementById('loading_screen').classList.add('d-none');
 }
 
-function savePokemonLocal() {
-    localStorage.setItem('savedPokemonCards', JSON.stringify(PokemonCards));
-    localStorage.setItem('savedPokemonDetails', JSON.stringify(PokemonDetails));
+function saveAllPokemonLocal() {
     localStorage.setItem('savedAllPokemon', JSON.stringify(allPokemon));
 }
 
-function loadAllPokemonLocal() {
-    let savedAllPokemon = localStorage.getItem('savedAllPokemon');
-    if (savedAllPokemon) {
-        allPokemon = JSON.parse(savedAllPokemon);
-    }
-    renderBasket();
-    render();
+function savePokemonCardsLocal() {
+    localStorage.setItem('savedPokemonCards', JSON.stringify(PokemonCards));
+}
+
+function savePokemonDetailsLocal() {
+    localStorage.setItem('savedPokemonDetails', JSON.stringify(PokemonDetails));
 }
 
 function loadPokemonCardsLocal() {
@@ -188,22 +208,6 @@ function loadPokemonDetailsLocal() {
         openPokemonDetail(next)
     }
   }
-
-async function loadPokemonCount() {
-    let data = await fetchData(`pokemon`);
-    return data.count;
-}
-
-// HIER !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-async function loadAllPokemon() {
-    let count = await loadPokemonCount();
-    if (count.length === allPokemon.length) {
-        loadPokemonLocal();
-    } else {
-        let data = await fetchData(`pokemon?limit=${count}&offset=0`);
-    }
-    allPokemon = data.results.map(pokemon => pokemon.name);
-}
 
 function searchPokemon(event) {
     event.preventDefault();

@@ -1,7 +1,7 @@
 function init() {
     includeHTML();
     loadMorePokemon();
-    loadSavedPokemon();
+    loadPokemonNames();
     closePokemonSearch();
 }
 
@@ -21,11 +21,62 @@ async function includeHTML() {
 
 // fetch from API
 async function fetchData(path = "") {
-    let response = await fetch(BASE_URL + path);
-    return response.json();
+    try {
+        let response = await fetch(BASE_URL + path);
+        return await response.json();
+    } catch (error) {
+        console.error(`Fehler bei fetchData(${endpoint}):`, error);
+    }
 }
 
-// get from local storage
+// load Pokemon Names
+async function fetchPokemonCount() {
+    let data = await fetchData(`pokemon`);
+    return data.count;
+}
+
+async function loadPokemonNames() {
+    let count = await fetchPokemonCount();
+    getPokemonNamesLocalStorage();
+    if (count === PokemonNames.length) {
+
+    } else {
+        let data = await fetchData(`pokemon?limit=${count}&offset=0`);
+        PokemonNames = data.results.map(pokemon => pokemon.name);
+        savePokemonNamesLocal();
+    }
+}
+
+function getPokemonNamesLocalStorage() {
+    let savedPokemonNames = localStorage.getItem('savedPokemonNames');
+    if (savedPokemonNames) {
+        PokemonNames = JSON.parse(savedPokemonNames);
+    }
+}
+
+function savePokemonNamesLocal() {
+    localStorage.setItem('savedPokemonNames', JSON.stringify(PokemonNames));
+}
+
+// load All Pokemon
+async function loadMorePokemon() {
+    await getAllPokemonLocalStorage();
+    
+    if (allPokemon.length > 0) {
+        console.log("Pokémon-Daten sind bereits geladen.");
+    } else {
+        console.log("Pokémon-Daten fehlen, fetch wird gestartet.");
+        await fetchPokemon();
+    }
+    
+    saveAllPokemonLocal();
+    for (let i = 0; i < allPokemon.length; i++) {
+        let pokemon = allPokemon[i];
+        await renderPokemonCards(pokemon);
+    }
+    offset += limit;
+}
+
 function getAllPokemonLocalStorage() {
     let savedAllPokemon = localStorage.getItem('savedAllPokemon');
     if (savedAllPokemon) {
@@ -33,56 +84,100 @@ function getAllPokemonLocalStorage() {
     }
 }
 
-// load data (get local storage or fetch from api)
+async function fetchPokemon() {
+    try {
+        let pokemonList = await fetchData(`pokemon?limit=${limit}&offset=${offset}`);
+
+        for (let i = 0; i < pokemonList.results.length; i++) {
+            let pokemon = pokemonList.results[i];
+            let pokemonName = pokemon.name;
+            await fetchPokemonInfoLoop(pokemonName);
+        }
+
+        console.log("Pokémon-Daten erfolgreich geladen:", allPokemon);
+    } catch (error) {
+        console.error("Fehler bei fetchPokemon():", error);
+    }
+}
+
+async function fetchPokemonInfoLoop(pokemonName) {
+    try {
+        let pokemonDetails = await fetchData(`pokemon/${pokemonName}`);
+
+        let pokemonData = {
+            id: pokemonDetails.id,
+            name: pokemonDetails.name,
+            sprite: pokemonDetails.sprites.front_default,
+            types: [
+                pokemonDetails.types[0].type.name,
+                pokemonDetails.types[1]?.type.name || ""
+            ],
+            height: pokemonDetails.height / 10,
+            weight: pokemonDetails.weight / 10,
+            species: pokemonDetails.species.name,
+            abilities: [
+                pokemonDetails.abilities[0]?.ability.name || "",
+                pokemonDetails.abilities[1]?.ability.name || "",
+                pokemonDetails.abilities[2]?.ability.name || ""
+            ],
+            stats: {
+                hp: pokemonDetails.stats[0].base_stat,
+                atk: pokemonDetails.stats[1].base_stat,
+                def: pokemonDetails.stats[2].base_stat,
+                spatk: pokemonDetails.stats[3].base_stat,
+                spdef: pokemonDetails.stats[4].base_stat,
+                spd: pokemonDetails.stats[5].base_stat
+            }
+        };
+
+        allPokemon.push(pokemonData);
+    } catch (error) {
+        console.error(`Fehler bei fetchPokemonInfoLoop(${pokemonName}):`, error);
+    }
+}
+
+function saveAllPokemonLocal() {
+    localStorage.setItem('savedAllPokemon', JSON.stringify(allPokemon));
+}
+
+
+/////////////
+
+
+async function loadMorePokemon1() {
+    document.getElementById('loading_screen').classList.remove('d-none');
+    let pokemonList = await loadPokemonData();
+    await renderPokemonCards(pokemonList);
+    await document.getElementById('loading_screen').classList.add('d-none');
+}
+
 async function loadPokemonData() {
     let data = await fetchData(`pokemon?limit=${limit}&offset=${offset}`);
     offset += limit;
     return data.results;
 }
 
-async function fetchPokemonCount() {
-    let data = await fetchData(`pokemon`);
-    return data.count;
-}
-
-async function loadSavedPokemon() {
-    let count = await fetchPokemonCount();
-    if (localStorage.getItem('savedAllPokemon')) {
-        getAllPokemonLocalStorage();
-    } else {
-        let data = await fetchData(`pokemon?limit=${count}&offset=0`);
-        allPokemon = data.results.map(pokemon => pokemon.name);
-        saveAllPokemonLocal();
-    }
-}
-
 // render
-async function renderPokemonCards(pokemonList) {
-    for (let i = 0; i < pokemonList.length; i++) {
-        let pokemon = pokemonList[i];
-        let pokemonName = pokemon.name;
-        await fetchPokemonDetails(pokemonName);
-    }
-}
-
-async function fetchPokemonDetails(pokemonName) {
-    let pokemonDetails = await fetchData(`pokemon/${pokemonName}`);
-    let pokemonId = pokemonDetails.id;
-    let pokemonSprites = pokemonDetails.sprites.front_default;
-    let pokemonType1 = pokemonDetails.types[0].type.name;
-    let pokemonType2 = pokemonDetails.types[1] ? pokemonDetails.types[1].type.name : "";
-    let pokemonColour2 = pokemonDetails.types[1] ? pokemonDetails.types[1].type.name : pokemonType1;
+async function renderPokemonCards(pokemon) {
+    let pokemonId = pokemon.id;
+    let pokemonName = pokemon.name;
+    let pokemonSprite = pokemon.sprite;
+    let pokemonType1 = pokemon.types[0];
+    let pokemonType2 = pokemon.types[1] ? pokemon.types[1] : "";
+    let pokemonColour2 = pokemon.types[1] ? pokemon.types[1] : pokemonType1;
 
     let content = document.getElementById('content');
     content.innerHTML += createPokemonCard(
-        pokemonId, 
-        pokemonName, 
-        pokemonSprites, 
-        pokemonType1, 
-        pokemonType2, 
+        pokemonId,
+        pokemonName,
+        pokemonSprite,
+        pokemonType1,
+        pokemonType2,
         pokemonColour2);
 }
 
+
+// ANPASSEN!
 async function openPokemonDetail(pokemonId) {
     let pokemonDetails = await fetchData(`pokemon/${pokemonId}`);
     let topContent = document.getElementById('pokemon_sprite');
@@ -95,14 +190,14 @@ async function openPokemonDetail(pokemonId) {
     resetSearchResult();
 
     topContent.innerHTML = await createPokemonDetailTop(
-        pokemonId, 
-        pokemonName, 
-        pokemonSprites, 
-        pokemonType1, 
+        pokemonId,
+        pokemonName,
+        pokemonSprites,
+        pokemonType1,
         pokemonColour2);
 
-        pokemonDetailAbout(pokemonName);
-     document.getElementById('pokemon_detail_wrapper').classList.remove('d-none');
+    pokemonDetailAbout(pokemonName);
+    document.getElementById('pokemon_detail_wrapper').classList.remove('d-none');
 }
 
 async function pokemonDetailAbout(pokemonName) {
@@ -119,7 +214,7 @@ async function pokemonDetailAbout(pokemonName) {
     let pokemonAbilitiy3 = pokemonDetails.abilities?.[2]?.ability?.name ?? "";
 
     bottomContent.innerHTML = createPokemonDetailAbout(
-        pokemonType1, 
+        pokemonType1,
         pokemonType2,
         pokemonSpecies,
         pokemonHeight,
@@ -141,7 +236,7 @@ async function pokemonDetailStats(pokemonName) {
     let pokemonSpd = pokemonDetails.stats[5].base_stat;
 
     bottomContent.innerHTML = createPokemonDetailStats(
-        pokemonHp, 
+        pokemonHp,
         pokemonAtk,
         pokemonDef,
         pokemonSpatk,
@@ -156,58 +251,21 @@ function closePokemonDetail(event) {
     }
 }
 
-async function loadMorePokemon() {
-    document.getElementById('loading_screen').classList.remove('d-none');
-    let pokemonList = await loadPokemonData();
-    await renderPokemonCards(pokemonList);
-    await document.getElementById('loading_screen').classList.add('d-none');
-}
-
-function saveAllPokemonLocal() {
-    localStorage.setItem('savedAllPokemon', JSON.stringify(allPokemon));
-}
-
-function savePokemonCardsLocal() {
-    localStorage.setItem('savedPokemonCards', JSON.stringify(PokemonCards));
-}
-
-function savePokemonDetailsLocal() {
-    localStorage.setItem('savedPokemonDetails', JSON.stringify(PokemonDetails));
-}
-
-function loadPokemonCardsLocal() {
-    let savedPokemonCards = localStorage.getItem('savedPokemonCards');
-    if (savedPokemonCards) {
-        PokemonCards = JSON.parse(savedPokemonCards);
-    }
-    renderBasket();
-    render();
-}
-
-function loadPokemonDetailsLocal() {
-    let savedPokemonDetails = localStorage.getItem('savedPokemonDetails');
-     if (savedPokemonDetails) {
-        PokemonDetails = JSON.parse(savedPokemonDetails);
-    } 
-    renderBasket();
-    render();
-}
-
-  function leftImage(previous) {
+function leftImage(previous) {
     if (previous == 0) {
-        openPokemonDetail(previous+1)
+        openPokemonDetail(previous + 1)
     } else {
         openPokemonDetail(previous)
     }
-  }
-  
-  function rightImage(next) {
-    if (next == offset+1) {
-        openPokemonDetail(next-1)
+}
+
+function rightImage(next) {
+    if (next == offset + 1) {
+        openPokemonDetail(next - 1)
     } else {
         openPokemonDetail(next)
     }
-  }
+}
 
 function searchPokemon(event) {
     event.preventDefault();
@@ -220,7 +278,7 @@ function searchPokemon(event) {
         return;
     }
 
-    let matchedPokemon = allPokemon.filter(pokemon => pokemon.includes(searchName));
+    let matchedPokemon = PokemonNames.filter(pokemon => pokemon.includes(searchName));
     let limitedResults = matchedPokemon.slice(0, 6);
     currentPokemon = [...limitedResults];
     renderFoundPokemon(searchName);

@@ -1,4 +1,4 @@
-function createPokemonCard(pokemonId, pokemonName, pokemonSprites, pokemonType1, pokemonType2, pokemonColour2) {
+function createPokemonCard(pokemonId, pokemonName, pokemonSprite, pokemonType1, pokemonType2, pokemonColour2) {
     return `
         <div id="pkmn#${pokemonId}" onclick="openPokemonDetail(${pokemonId})" class="pokemon_card">
             <div class="pkmn_card_top">
@@ -9,7 +9,7 @@ function createPokemonCard(pokemonId, pokemonName, pokemonSprites, pokemonType1,
                     ${pokemonName}
                 </div>
             </div>
-            <img class="pokemon_img" src="${pokemonSprites}" alt="${pokemonName}_img">
+            <img class="pokemon_img" src="${pokemonSprite}" alt="${pokemonName}_img">
             <div class="center">
                 <span class="type_box ${pokemonType1}">${pokemonType1}</span>
                 <span class="type_box ${pokemonType2}">${pokemonType2}</span>

@@ -98,6 +98,7 @@
 
 .pokemon_detail_wrapper {
     z-index: 10;
+    position: absolute;
 }
 
 .pkmn_detail {
@@ -166,7 +167,6 @@
 .button_container {
     margin: 32px;
 }
-
 
 .left-button {
     z-index: 30;

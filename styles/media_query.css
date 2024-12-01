@@ -172,6 +172,7 @@
     .content_wrapper {
         display: flex;
         justify-content: center;
+        align-items: flex-start;
     }
 
     .left-button {
@@ -185,5 +186,21 @@
     .pokemon_detail {
         height: 540px;
         width: 960px;
+    }
+
+    .navbar {
+        justify-content: center;
+    }
+
+    .searchResult {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        left: calc(50vw - 75px);
+        z-index: 10;
+        background-color: rgba(68, 79, 89);
+        width: 320px;
+        padding: 8px;
+        gap: 4px;
     }
 }

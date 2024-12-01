@@ -127,7 +127,7 @@
 .pokemon_detail {
     background-color: rgb(243,242,233);
     z-index: 30;
-    height: 70vh;
+    height: 600px;
     width: 50vw;
     padding: 24px;
 }

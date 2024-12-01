@@ -43,11 +43,37 @@ function createPokemonDetailTop(pokemonId, pokemonName, pokemonSprites, pokemonT
             </div>
             <div class="pkmn_detail_bottom">
                 <div class="detail_buttons">
-                    <button onclick="pokemonDetailAbout('${pokemonName}')">About</button>
-                    <button onclick="pokemonDetailStats('${pokemonName}')">Stats</button>
+                    <button onclick="pokemonDetailAbout('${pokemonId}')">About</button>
+                    <button onclick="pokemonDetailStats('${pokemonId}')">Stats</button>
                 </div>
             </div>
             <img class="right-button icon" onclick="rightImage(${pokemonId+1})" src="assets/icons/right.png">
+        </div>
+    `;
+    }     if (pokemonId === offset) {
+        return `
+        <div class="pkmn_detail">
+            <div class="pkmn_detail_top">
+                <div>
+                    #${pokemonId}
+                </div>
+                <div>
+                    ${pokemonName}
+                </div>
+            </div>
+            <img class="pokemon_img" src="${pokemonSprites}" alt="${pokemonName}_img">
+            <div class="type_circle_detail">
+                <div class="upper_half ${pokemonType1}"></div>
+                <div class="lower_half ${pokemonColour2}"></div>
+                <div class="center_circle"></div>
+            </div>
+            <div class="pkmn_detail_bottom">
+                <div class="detail_buttons">
+                    <button onclick="pokemonDetailAbout('${pokemonId}')">About</button>
+                    <button onclick="pokemonDetailStats('${pokemonId}')">Stats</button>
+                </div>
+            </div>
+            <img class="left-button icon" onclick="leftImage(${pokemonId-1})" src="assets/icons/left.png">
         </div>
     `;
     } else {
@@ -69,8 +95,8 @@ function createPokemonDetailTop(pokemonId, pokemonName, pokemonSprites, pokemonT
                 </div>
                 <div class="pkmn_detail_bottom">
                     <div class="detail_buttons">
-                        <button onclick="pokemonDetailAbout('${pokemonName}')">About</button>
-                        <button onclick="pokemonDetailStats('${pokemonName}')">Stats</button>
+                        <button onclick="pokemonDetailAbout('${pokemonId}')">About</button>
+                        <button onclick="pokemonDetailStats('${pokemonId}')">Stats</button>
                     </div>
                 </div>
                 <img class="left-button icon" onclick="leftImage(${pokemonId-1})" src="assets/icons/left.png">
@@ -143,7 +169,7 @@ function createPokemonDetailStats(pokemonHp, pokemonAtk, pokemonDef, pokemonSpat
 
 function createFoundPokemon(pokemonId, pokemonName, pokemonSprites) {
     return `
-    <div onclick="openPokemonDetail(${pokemonId})" class="pokemon_card_small">
+    <div onclick="openPokemonDetailFromSearch(${pokemonId})" class="pokemon_card_small">
         <div class="pkmn_search">
                 ${pokemonName}
         </div>
@@ -158,4 +184,31 @@ function createSearchError(message) {
         ${message}
     </div>
 `;
+}
+
+function createFetchedPokemonDetailTop(pokemonId, pokemonName, pokemonSprites, pokemonType1, pokemonColour2) {
+        return `
+        <div class="pkmn_detail">
+            <div class="pkmn_detail_top">
+                <div>
+                    #${pokemonId}
+                </div>
+                <div>
+                    ${pokemonName}
+                </div>
+            </div>
+            <img class="pokemon_img" src="${pokemonSprites}" alt="${pokemonName}_img">
+            <div class="type_circle_detail">
+                <div class="upper_half ${pokemonType1}"></div>
+                <div class="lower_half ${pokemonColour2}"></div>
+                <div class="center_circle"></div>
+            </div>
+            <div class="pkmn_detail_bottom">
+                <div class="detail_buttons">
+                    <button onclick="fetchedPokemonDetailAbout('${pokemonId}')">About</button>
+                    <button onclick="fetchedPokemonDetailStats('${pokemonId}')">Stats</button>
+                </div>
+            </div>
+        </div>
+    `;
 }

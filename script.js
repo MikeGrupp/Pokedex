@@ -19,7 +19,6 @@ async function includeHTML() {
     }
 }
 
-// fetch from API
 async function fetchData(path = "") {
     try {
         let response = await fetch(BASE_URL + path);
@@ -29,7 +28,6 @@ async function fetchData(path = "") {
     }
 }
 
-// load Pokemon Names
 async function fetchPokemonCount() {
     let data = await fetchData(`pokemon`);
     return data.count;
@@ -58,8 +56,8 @@ function savePokemonNamesLocal() {
     localStorage.setItem('savedPokemonNames', JSON.stringify(PokemonNames));
 }
 
-// load All Pokemon
 async function loadPokemon() {
+    document.getElementById('loading_screen').classList.remove('d-none');
     await getAllPokemonLocalStorage();
 
     if (allPokemon.length > 0) {
@@ -75,6 +73,7 @@ async function loadPokemon() {
         await renderPokemonCards(pokemon);
     }
     offset += limit;
+    await document.getElementById('loading_screen').classList.add('d-none');
 }
 
 function getAllPokemonLocalStorage() {
@@ -161,7 +160,6 @@ function saveAllPokemonLocal() {
     localStorage.setItem('savedAllPokemon', JSON.stringify(allPokemon));
 }
 
-// render
 async function renderPokemonCards(pokemon) {
     let pokemonId = pokemon.id;
     let pokemonName = pokemon.name;
@@ -340,6 +338,7 @@ function displayResult(message) {
 }
 
 async function openFetchedPokemonDetail(pokemonId) {
+    document.getElementById('loading_screen').classList.remove('d-none');
     let pokemonDetails = await fetchData(`pokemon/${pokemonId}`);
     let topContent = document.getElementById('pokemon_sprite');
     let pokemonName = pokemonDetails.name;
@@ -358,6 +357,7 @@ async function openFetchedPokemonDetail(pokemonId) {
 
     fetchedPokemonDetailAbout(pokemonId);
     document.getElementById('pokemon_detail_wrapper').classList.remove('d-none');
+    await document.getElementById('loading_screen').classList.add('d-none');
 }
 
 async function fetchedPokemonDetailAbout(pokemonId) {
